@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "title": "Valid Image Item",
+    "description": "This item has valid image URLs",
+    "image": "https://picsum.photos/200/300",
+    "thumbnail": "https://picsum.photos/100/100"
+  },
+  {
+    "id": 2,
+    "name": "Broken Image Item",
+    "description": "This item has broken image URLs",
+    "image": "https://invalid-domain-that-does-not-exist.com/image.jpg",
+    "thumbnail": "https://another-invalid.com/thumb.png"
+  },
+  {
+    "id": 3,
+    "title": "Mixed Images",
+    "description": "This item has both valid and broken images",
+    "images": [
+      "https://picsum.photos/200/301",
+      "https://broken-url-123.com/fake.jpg",
+      "https://picsum.photos/200/302"
+    ]
+  },
+  {
+    "id": 4,
+    "title": "No Images",
+    "description": "This item has no image URLs",
+    "tags": ["test", "sample"],
+    "count": 42
+  },
+  {
+    "id": 5,
+    "name": "URL Without Extension",
+    "description": "Valid image but no extension in URL",
+    "avatar": "https://picsum.photos/200"
+  },
+  {
+    "id": 6,
+    "title": "Multiple Images",
+    "description": "Multiple valid images",
+    "gallery": [
+      "https://picsum.photos/200/303",
+      "https://picsum.photos/200/304",
+      "https://picsum.photos/200/305",
+      "https://picsum.photos/200/306",
+      "https://picsum.photos/200/307"
+    ]
+  }
+]

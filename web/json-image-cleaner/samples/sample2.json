@@ -1,0 +1,12 @@
+[
+  {"id": 1, "title": "Item with valid PNG", "image": "https://www.w3schools.com/images/w3schools_green.jpg"},
+  {"id": 2, "title": "Item with valid JPG", "image": "https://picsum.photos/200/300"},
+  {"id": 3, "title": "Item with GIF", "image": "https://httpbin.org/image/gif"},
+  {"id": 4, "title": "Item with WebP", "image": "https://www.gstatic.com/webp/gallery/1.webp"},
+  {"id": 5, "title": "Broken image URL", "image": "https://broken-link-12345.com/image.png"},
+  {"id": 6, "title": "Another broken", "image": "https://nonexistent-domain-xyz.com/image.jpg"},
+  {"id": 7, "title": "Valid and broken mixed", "images": ["https://picsum.photos/200/301", "https://fake-url.com/test.png"]},
+  {"id": 8, "title": "No image field", "data": {"foo": "bar"}},
+  {"id": 9, "title": "Image without extension", "url": "https://picsum.photos/id/237/200/300"},
+  {"id": 10, "title": "All valid multiple", "images": ["https://picsum.photos/200/302", "https://picsum.photos/200/303", "https://picsum.photos/200/304"]}
+]
