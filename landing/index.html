@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVPBot — MVP за 14 дней</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(20, 20, 30, 0.6);
+            --text-primary: #ffffff;
+            --text-secondary: #8a8a9a;
+            --accent-cyan: #00f5ff;
+            --accent-magenta: #ff00ff;
+            --accent-lime: #b8ff00;
+            --accent-orange: #ff6b00;
+            --gradient-1: linear-gradient(135deg, #00f5ff 0%, #ff00ff 100%);
+            --gradient-2: linear-gradient(135deg, #ff00ff 0%, #ff6b00 100%);
+            --gradient-3: linear-gradient(135deg, #b8ff00 0%, #00f5ff 100%);
+            --glow-cyan: 0 0 40px rgba(0, 245, 255, 0.4);
+            --glow-magenta: 0 0 40px rgba(255, 0, 255, 0.4);
+            --glow-lime: 0 0 40px rgba(184, 255, 0, 0.4);
+            --border-glow: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 20px 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: transparent;
+        }
+
+        nav.scrolled {
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 0;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            text-decoration: none;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.5)); }
+            50% { filter: drop-shadow(0 0 20px rgba(255, 0, 255, 0.5)); }
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-cyan);
+            transition: width 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: #000;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 0 60px rgba(0, 245, 255, 0.6);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            box-shadow: inset 0 0 20px rgba(0, 245, 255, 0.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding: 120px 0 80px;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 50px;
+            font-size: 14px;
+            color: var(--accent-cyan);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent-lime);
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 8vw, 80px);
+            line-height: 1.05;
+            margin-bottom: 24px;
+            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero h1 .highlight {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            position: relative;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Space Mono', monospace;
+            font-size: 48px;
+            font-weight: 700;
+            background: var(--gradient-3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.3;
+            animation: blob 8s ease-in-out infinite;
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-cyan);
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-magenta);
+            top: 60%;
+            right: 10%;
+            animation-delay: -3s;
+        }
+
+        .blob-3 {
+            width: 250px;
+            height: 250px;
+            background: var(--accent-lime);
+            bottom: 20%;
+            left: 30%;
+            animation-delay: -5s;
+        }
+
+        @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Process Section */
+        .process {
+            padding: 150px 0;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-title {
+            font-size: clamp(32px, 5vw, 56px);
+            margin-bottom: 20px;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .process-card {
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 24px;
+            padding: 40px 32px;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+        }
+
+        .process-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .process-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0, 245, 255, 0.3);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .process-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .process-number {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-family: 'Space Mono', monospace;
+            font-size: 64px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.03);
+            line-height: 1;
+        }
+
+        .process-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: #000;
+            font-size: 24px;
+        }
+
+        .process-card h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        .process-card p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        /* Timeline Section */
+        .timeline {
+            padding: 150px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 245, 255, 0.02) 50%, transparent 100%);
+        }
+
+        .timeline-visual {
+            position: relative;
+            padding: 60px 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta), var(--accent-lime));
+            border-radius: 2px;
+            transform: translateY(-50%);
+        }
+
+        .timeline-items {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .timeline-item {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            position: relative;
+            z-index: 1;
+            box-shadow: var(--glow-cyan);
+            animation: dotPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes dotPulse {
+            0%, 100% { box-shadow: var(--glow-cyan); }
+            50% { box-shadow: 0 0 40px rgba(0, 245, 255, 0.8); }
+        }
+
+        .timeline-content {
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(20px);
+            margin: 0 10px;
+        }
+
+        .timeline-day {
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            color: var(--accent-cyan);
+            margin-bottom: 8px;
+        }
+
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .timeline-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 150px 0;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            align-items: start;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 32px;
+            padding: 48px 40px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,245,255,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .pricing-card:hover::before {
+            opacity: 1;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--accent-magenta);
+            box-shadow: var(--glow-magenta);
+        }
+
+        .pricing-card.featured::after {
+            content: 'ПОПУЛЯРНЫЙ';
+            position: absolute;
+            top: 20px;
+            right: -35px;
+            background: var(--accent-magenta);
+            color: #fff;
+            padding: 6px 40px;
+            font-size: 11px;
+            font-weight: 700;
+            transform: rotate(45deg);
+        }
+
+        .pricing-card h3 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .pricing-price {
+            font-family: 'Space Mono', monospace;
+            font-size: 42px;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 32px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 40px;
+        }
+
+        .pricing-features li {
+            padding: 14px 0;
+            color: var(--text-secondary);
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-features li i {
+            color: var(--accent-lime);
+            flex-shrink: 0;
+        }
+
+        .pricing-card .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Ideas Section */
+        .ideas {
+            padding: 150px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(255, 0, 255, 0.02) 50%, transparent 100%);
+        }
+
+        .ideas-filters {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 50px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-family: inherit;
+            backdrop-filter: blur(10px);
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            border-color: var(--accent-magenta);
+            color: var(--accent-magenta);
+            box-shadow: inset 0 0 20px rgba(255, 0, 255, 0.1);
+        }
+
+        .ideas-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .idea-card {
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 24px;
+            padding: 32px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .idea-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-2);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .idea-card:hover {
+            transform: translateY(-8px) rotate(1deg);
+            border-color: rgba(255, 0, 255, 0.3);
+            box-shadow: var(--glow-magenta);
+        }
+
+        .idea-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .idea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .idea-category {
+            font-size: 12px;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .idea-badge {
+            font-size: 20px;
+        }
+
+        .idea-card h4 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .idea-tech {
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            color: var(--accent-cyan);
+            margin-bottom: 24px;
+        }
+
+        .idea-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .idea-price {
+            font-family: 'Space Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent-lime);
+        }
+
+        /* Why Section */
+        .why {
+            padding: 150px 0;
+        }
+
+        .why-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .why-benefits {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .benefit-item {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            padding: 24px;
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s;
+        }
+
+        .benefit-item:hover {
+            border-color: rgba(0, 245, 255, 0.3);
+            transform: translateX(10px);
+        }
+
+        .benefit-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-2);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .benefit-content h4 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .benefit-content p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .comparison-table {
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+        }
+
+        .comparison-table h3 {
+            font-size: 28px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-row.header {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .comparison-row .mvpbot {
+            color: var(--accent-lime);
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Agents Section */
+        .agents {
+            padding: 150px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(184, 255, 0, 0.02) 50%, transparent 100%);
+        }
+
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 24px;
+            padding: 36px 28px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-3);
+        }
+
+        .agent-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(184, 255, 0, 0.3);
+            box-shadow: var(--glow-lime);
+        }
+
+        .agent-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            color: #000;
+            font-size: 32px;
+            position: relative;
+        }
+
+        .agent-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-lime);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .agent-card:hover .agent-avatar::after {
+            opacity: 1;
+            animation: avatarPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes avatarPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.5; }
+        }
+
+        .agent-card h4 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .agent-role {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .agent-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .agent-tag {
+            font-size: 11px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            color: var(--accent-cyan);
+            font-weight: 500;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 150px 0;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 24px;
+            padding: 40px 32px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 107, 0, 0.3);
+            box-shadow: 0 0 40px rgba(255, 107, 0, 0.2);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .service-card h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        .service-card p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .services-cta {
+            text-align: center;
+            margin-top: 60px;
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        .services-cta a {
+            color: var(--accent-orange);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .services-cta a:hover {
+            text-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+        }
+
+        /* FAQ Section */
+        .faq {
+            padding: 150px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 245, 255, 0.02) 50%, transparent 100%);
+        }
+
+        .faq-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 20px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 28px 32px;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: inherit;
+            transition: color 0.3s;
+        }
+
+        .faq-question:hover {
+            color: var(--accent-cyan);
+        }
+
+        .faq-question i {
+            transition: transform 0.3s;
+            color: var(--accent-cyan);
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .faq-answer p {
+            padding: 0 32px 28px;
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 150px 0;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+        }
+
+        .contact-form {
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 32px;
+            padding: 48px;
+            backdrop-filter: blur(20px);
+        }
+
+        .contact-form h3 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .contact-form > p {
+            color: var(--text-secondary);
+            margin-bottom: 36px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: inset 0 0 20px rgba(0, 245, 255, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .form-success {
+            display: none;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(184, 255, 0, 0.1), rgba(0, 245, 255, 0.1));
+            border: 1px solid var(--accent-lime);
+            border-radius: 16px;
+            color: var(--accent-lime);
+            text-align: center;
+            animation: successPop 0.5s ease;
+        }
+
+        @keyframes successPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .form-success.show {
+            display: block;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .contact-item {
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 24px;
+            padding: 36px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s;
+        }
+
+        .contact-item:hover {
+            border-color: rgba(255, 0, 255, 0.3);
+            transform: translateX(10px);
+        }
+
+        .contact-item h4 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .contact-item p, .contact-item a {
+            font-size: 22px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .contact-item a:hover {
+            color: var(--accent-magenta);
+        }
+
+        .contact-item .btn {
+            margin-top: 20px;
+        }
+
+        .contact-note {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .footer-logo {
+            font-size: 28px;
+            font-weight: 900;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 32px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 16px;
+        }
+
+        .footer-social a {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-card);
+            border: var(--border-glow);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-social a:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            transform: translateY(-4px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Glitch Effect */
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-1 2s infinite linear alternate-reverse;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+            -webkit-text-fill-color: var(--accent-cyan);
+            opacity: 0.8;
+        }
+
+        .glitch::after {
+            animation: glitch-2 3s infinite linear alternate-reverse;
+            clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+            -webkit-text-fill-color: var(--accent-magenta);
+            opacity: 0.8;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(3px, -3px); }
+            40% { transform: translate(3px, 3px); }
+            60% { transform: translate(-3px, -3px); }
+            80% { transform: translate(-3px, 3px); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .process-grid,
+            .pricing-grid,
+            .ideas-grid,
+            .services-grid,
+            .agents-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .why-grid,
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-items {
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            .timeline-item {
+                flex: none;
+                width: calc(33.333% - 14px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero-stats {
+                gap: 30px;
+            }
+
+            .stat-number {
+                font-size: 36px;
+            }
+
+            .process-grid,
+            .pricing-grid,
+            .ideas-grid,
+            .services-grid,
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-item {
+                width: 100%;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+        }
+
+        /* SVG Animations */
+        .animated-svg {
+            animation: svgFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes svgFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        /* Scroll animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="#" class="logo">MVPBot</a>
+                <ul class="nav-menu">
+                    <li><a href="#process">Процесс</a></li>
+                    <li><a href="#timeline">График</a></li>
+                    <li><a href="#pricing">Тарифы</a></li>
+                    <li><a href="#ideas">Идеи</a></li>
+                    <li><a href="#agents">Агенты</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#contact">Контакты</a></li>
+                </ul>
+                <a href="#contact" class="btn btn-primary">Получить MVP</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="floating-element blob-1"></div>
+        <div class="floating-element blob-2"></div>
+        <div class="floating-element blob-3"></div>
+        
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span>AI-POWERED РАЗРАБОТКА</span>
+                </div>
+                <h1>
+                    Запустите <span class="highlight glitch" data-text="MVP за 14 дней">MVP за 14 дней</span><br>
+                    с AI-агентами
+                </h1>
+                <p class="hero-subtitle">От идеи до первых пользователей. Без найма команды. Без хаоса. Только результат за 2 недели.</p>
+                <div class="hero-ctas">
+                    <a href="#contact" class="btn btn-primary">Начать проект →</a>
+                    <a href="#timeline" class="btn btn-outline">Смотреть график</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">MVP запущено</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">дней среднее время</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">94</div>
+                        <div class="stat-label">NPS Score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process" id="process">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Полный цикл MVP</h2>
+                <p class="section-subtitle">От идеи до запуска — всё под контролем AI-агентов</p>
+            </div>
+            <div class="process-grid">
+                <div class="process-card">
+                    <span class="process-number">01</span>
+                    <div class="process-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <h3>Идея и валидация</h3>
+                    <p>AI анализирует рынок, конкурентов и аудиторию для проверки вашей гипотезы</p>
+                </div>
+                <div class="process-card">
+                    <span class="process-number">02</span>
+                    <div class="process-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                    </div>
+                    <h3>Архитектура</h3>
+                    <p>Автогенерация технического задания и оптимального стека технологий</p>
+                </div>
+                <div class="process-card">
+                    <span class="process-number">03</span>
+                    <div class="process-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    </div>
+                    <h3>Дизайн</h3>
+                    <p>UI/UX прототип за 24 часа с учётом лучших практик</p>
+                </div>
+                <div class="process-card">
+                    <span class="process-number">04</span>
+                    <div class="process-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg>
+                    </div>
+                    <h3>Разработка</h3>
+                    <p>AI-агенты пишут код параллельно, ускоряя процесс в разы</p>
+                </div>
+                <div class="process-card">
+                    <span class="process-number">05</span>
+                    <div class="process-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    </div>
+                    <h3>Тестирование</h3>
+                    <p>Автоматизированное QA и фикс багов без задержек</p>
+                </div>
+                <div class="process-card">
+                    <span class="process-number">06</span>
+                    <div class="process-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+                    </div>
+                    <h3>Запуск</h3>
+                    <p>Деплой, настройка аналитики и привлечение первых пользователей</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="timeline" id="timeline">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">14 дней до запуска</h2>
+                <p class="section-subtitle">Каждый день — конкретный результат</p>
+            </div>
+            <div class="timeline-visual">
+                <div class="timeline-line"></div>
+                <div class="timeline-items">
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-day">День 1</div>
+                            <div class="timeline-title">Kickoff</div>
+                            <div class="timeline-desc">Брифинг, анализ</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-day">День 2-3</div>
+                            <div class="timeline-title">Дизайн</div>
+                            <div class="timeline-desc">Wireframes, UI</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-day">День 4-9</div>
+                            <div class="timeline-title">Разработка</div>
+                            <div class="timeline-desc">Frontend + Backend</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-day">День 10-11</div>
+                            <div class="timeline-title">QA</div>
+                            <div class="timeline-desc">Тесты, багфиксы</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-day">День 12-13</div>
+                            <div class="timeline-title">Pre-launch</div>
+                            <div class="timeline-desc">Финальные тесты</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-day">День 14</div>
+                            <div class="timeline-title">🚀 Запуск</div>
+                            <div class="timeline-desc">Деплой в продакшн</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Тарифы</h2>
+                <p class="section-subtitle">Выберите подходящий формат для вашего проекта</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Старт</h3>
+                    <div class="pricing-price">149 000 ₽</div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check-circle"></i> Лендинг или простое веб-приложение</li>
+                        <li><i data-lucide="check-circle"></i> До 5 экранов</li>
+                        <li><i data-lucide="check-circle"></i> 1 AI-агент</li>
+                        <li><i data-lucide="check-circle"></i> Срок: до 7 дней</li>
+                        <li><i data-lucide="check-circle"></i> Деплой на хостинг</li>
+                        <li><i data-lucide="check-circle"></i> Поддержка 7 дней</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-outline">Выбрать</a>
+                </div>
+                <div class="pricing-card featured">
+                    <h3>MVP</h3>
+                    <div class="pricing-price">349 000 ₽</div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check-circle"></i> Полноценный MVP (web/mobile)</li>
+                        <li><i data-lucide="check-circle"></i> До 15 экранов</li>
+                        <li><i data-lucide="check-circle"></i> 3 AI-агента</li>
+                        <li><i data-lucide="check-circle"></i> Срок: 14 дней</li>
+                        <li><i data-lucide="check-circle"></i> CI/CD пайплайн</li>
+                        <li><i data-lucide="check-circle"></i> Аналитика и мониторинг</li>
+                        <li><i data-lucide="check-circle"></i> Поддержка 30 дней</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-primary">Начать проект</a>
+                </div>
+                <div class="pricing-card">
+                    <h3>Продукт</h3>
+                    <div class="pricing-price">от 699 000 ₽</div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check-circle"></i> Сложный продукт (SaaS)</li>
+                        <li><i data-lucide="check-circle"></i> Неограниченные экраны</li>
+                        <li><i data-lucide="check-circle"></i> Полная команда агентов</li>
+                        <li><i data-lucide="check-circle"></i> Мобильное приложение</li>
+                        <li><i data-lucide="check-circle"></i> Срок: 14–30 дней</li>
+                        <li><i data-lucide="check-circle"></i> Поддержка 90 дней</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-outline">Обсудить проект</a>
+                </div>
+            </div>
+            <p style="text-align: center; color: var(--text-secondary); margin-top: 40px;">Все цены включают НДС. Рассрочка доступна.</p>
+        </div>
+    </section>
+
+    <!-- Ideas Section -->
+    <section class="ideas" id="ideas">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Готовые MVP-идеи</h2>
+                <p class="section-subtitle">Берите и запускайте — спрос уже подтверждён</p>
+            </div>
+            <div class="ideas-filters">
+                <button class="filter-btn active" data-filter="all">Все</button>
+                <button class="filter-btn" data-filter="saas">SaaS</button>
+                <button class="filter-btn" data-filter="marketplace">Маркетплейс</button>
+                <button class="filter-btn" data-filter="b2b">B2B</button>
+                <button class="filter-btn" data-filter="fintech">Fintech</button>
+                <button class="filter-btn" data-filter="game">Game</button>
+            </div>
+            <div class="ideas-grid">
+                <div class="idea-card" data-category="saas">
+                    <div class="idea-header">
+                        <span class="idea-category">SaaS</span>
+                        <span class="idea-badge">🔥</span>
+                    </div>
+                    <h4>AI-планировщик задач для фрилансеров</h4>
+                    <p class="idea-tech">Next.js + Supabase</p>
+                    <div class="idea-footer">
+                        <span class="idea-price">от 149 000 ₽</span>
+                        <a href="#contact" class="btn btn-outline" style="padding: 10px 18px; font-size: 13px;">Хочу</a>
+                    </div>
+                </div>
+                <div class="idea-card" data-category="marketplace">
+                    <div class="idea-header">
+                        <span class="idea-category">Маркетплейс</span>
+                        <span class="idea-badge">🔥</span>
+                    </div>
+                    <h4>Маркетплейс юридических услуг</h4>
+                    <p class="idea-tech">React + Node</p>
+                    <div class="idea-footer">
+                        <span class="idea-price">от 349 000 ₽</span>
+                        <a href="#contact" class="btn btn-outline" style="padding: 10px 18px; font-size: 13px;">Хочу</a>
+                    </div>
+                </div>
+                <div class="idea-card" data-category="b2b">
+                    <div class="idea-header">
+                        <span class="idea-category">B2B</span>
+                        <span class="idea-badge">⚡</span>
+                    </div>
+                    <h4>Telegram-бот для HR-автоматизации</h4>
+                    <p class="idea-tech">Python + aiogram</p>
+                    <div class="idea-footer">
+                        <span class="idea-price">от 149 000 ₽</span>
+                        <a href="#contact" class="btn btn-outline" style="padding: 10px 18px; font-size: 13px;">Хочу</a>
+                    </div>
+                </div>
+                <div class="idea-card" data-category="saas">
+                    <div class="idea-header">
+                        <span class="idea-category">SaaS</span>
+                        <span class="idea-badge">🔥</span>
+                    </div>
+                    <h4>SaaS для управления контентом</h4>
+                    <p class="idea-tech">Next.js + OpenAI</p>
+                    <div class="idea-footer">
+                        <span class="idea-price">от 349 000 ₽</span>
+                        <a href="#contact" class="btn btn-outline" style="padding: 10px 18px; font-size: 13px;">Хочу</a>
+                    </div>
+                </div>
+                <div class="idea-card" data-category="fintech">
+                    <div class="idea-header">
+                        <span class="idea-category">Fintech</span>
+                        <span class="idea-badge">🔥</span>
+                    </div>
+                    <h4>AI-ассистент для бухгалтера</h4>
+                    <p class="idea-tech">Python + GPT-4</p>
+                    <div class="idea-footer">
+                        <span class="idea-price">от 349 000 ₽</span>
+                        <a href="#contact" class="btn btn-outline" style="padding: 10px 18px; font-size: 13px;">Хочу</a>
+                    </div>
+                </div>
+                <div class="idea-card" data-category="game">
+                    <div class="idea-header">
+                        <span class="idea-category">Game</span>
+                        <span class="idea-badge">⚡</span>
+                    </div>
+                    <h4>Telegram-игра с TON-монетизацией</h4>
+                    <p class="idea-tech">JS + TON SDK</p>
+                    <div class="idea-footer">
+                        <span class="idea-price">от 149 000 ₽</span>
+                        <a href="#contact" class="btn btn-outline" style="padding: 10px 18px; font-size: 13px;">Хочу</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Section -->
+    <section class="why" id="why">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Почему MVPBot</h2>
+            </div>
+            <div class="why-grid">
+                <div class="why-benefits">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        </div>
+                        <div class="benefit-content">
+                            <h4>В 5x быстрее</h4>
+                            <p>AI-агенты работают параллельно 24/7, ускоряя каждый этап разработки</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                        <div class="benefit-content">
+                            <h4>В 3x дешевле</h4>
+                            <p>Никаких накладных расходов на менеджеров, офис и оборудование</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                        </div>
+                        <div class="benefit-content">
+                            <h4>Фокус на результат</h4>
+                            <p>Не код ради кода, а MVP ради реальных пользователей</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+                        </div>
+                        <div class="benefit-content">
+                            <h4>Итерации за часы</h4>
+                            <p>Правки и изменения без задержек — AI мгновенно вносит корректировки</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-table">
+                    <h3>Обычная разработка vs MVPBot</h3>
+                    <div class="comparison-row header">
+                        <span>Критерий</span>
+                        <span>Команда</span>
+                        <span>MVPBot</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Сроки</span>
+                        <span>2-6 мес</span>
+                        <span class="mvpbot">14 дней</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Стоимость</span>
+                        <span>500K-3M ₽</span>
+                        <span class="mvpbot">149K-699K ₽</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Команда</span>
+                        <span>5-10 чел</span>
+                        <span class="mvpbot">AI-агенты</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Прозрачность</span>
+                        <span>Раз в неделю</span>
+                        <span class="mvpbot">Ежедневно</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Гарантия</span>
+                        <span>Нет</span>
+                        <span class="mvpbot">100% возврат</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agents Section -->
+    <section class="agents" id="agents">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">AI-Агенты</h2>
+                <p class="section-subtitle">Команда экспертов в каждой области</p>
+            </div>
+            <div class="agents-grid">
+                <div class="agent-card">
+                    <div class="agent-avatar">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                    </div>
+                    <h4>Architect</h4>
+                    <p class="agent-role">Проектирует архитектуру</p>
+                    <div class="agent-tags">
+                        <span class="agent-tag">System Design</span>
+                        <span class="agent-tag">DB Schema</span>
+                    </div>
+                </div>
+                <div class="agent-card">
+                    <div class="agent-avatar">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h3v10H7z"/><path d="M14 7h3v10h-3z"/></svg>
+                    </div>
+                    <h4>Frontend</h4>
+                    <p class="agent-role">Разрабатывает интерфейсы</p>
+                    <div class="agent-tags">
+                        <span class="agent-tag">React</span>
+                        <span class="agent-tag">Next.js</span>
+                    </div>
+                </div>
+                <div class="agent-card">
+                    <div class="agent-avatar">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg>
+                    </div>
+                    <h4>Backend</h4>
+                    <p class="agent-role">Создаёт API и логику</p>
+                    <div class="agent-tags">
+                        <span class="agent-tag">Node.js</span>
+                        <span class="agent-tag">Python</span>
+                    </div>
+                </div>
+                <div class="agent-card">
+                    <div class="agent-avatar">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                    </div>
+                    <h4>Designer</h4>
+                    <p class="agent-role">Генерирует UI/UX</p>
+                    <div class="agent-tags">
+                        <span class="agent-tag">UI/UX</span>
+                        <span class="agent-tag">Figma</span>
+                    </div>
+                </div>
+                <div class="agent-card">
+                    <div class="agent-avatar">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    </div>
+                    <h4>QA Engineer</h4>
+                    <p class="agent-role">Тестирование и баги</p>
+                    <div class="agent-tags">
+                        <span class="agent-tag">Testing</span>
+                        <span class="agent-tag">Automation</span>
+                    </div>
+                </div>
+                <div class="agent-card">
+                    <div class="agent-avatar">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                    </div>
+                    <h4>DevOps</h4>
+                    <p class="agent-role">CI/CD и деплой</p>
+                    <div class="agent-tags">
+                        <span class="agent-tag">Docker</span>
+                        <span class="agent-tag">AWS</span>
+                    </div>
+                </div>
+                <div class="agent-card">
+                    <div class="agent-avatar">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
+                    </div>
+                    <h4>Analyst</h4>
+                    <p class="agent-role">Исследование рынка</p>
+                    <div class="agent-tags">
+                        <span class="agent-tag">Research</span>
+                        <span class="agent-tag">Analytics</span>
+                    </div>
+                </div>
+                <div class="agent-card">
+                    <div class="agent-avatar">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </div>
+                    <h4>Copywriter</h4>
+                    <p class="agent-role">Контент и SEO</p>
+                    <div class="agent-tags">
+                        <span class="agent-tag">SEO</span>
+                        <span class="agent-tag">Content</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Что мы разрабатываем</h2>
+                <p class="section-subtitle">Любой цифровой продукт — от идеи до AppStore</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    </div>
+                    <h3>Web SaaS</h3>
+                    <p>Подписочные сервисы, платформы, дашборды. Next.js, React, Node.js</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+                    </div>
+                    <h3>Mobile Flutter</h3>
+                    <p>iOS и Android из одного кода. Нативная производительность</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <h3>Telegram Боты</h3>
+                    <p>Боты для бизнеса, продаж, поддержки и автоматизации</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </div>
+                    <h3>Telegram Mini Apps</h3>
+                    <p>Полноценные приложения внутри Telegram</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><circle cx="12" cy="12" r="10"/></svg>
+                    </div>
+                    <h3>Telegram Игры</h3>
+                    <p>Казуальные игры с монетизацией и TON-интеграцией</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    </div>
+                    <h3>Маркетплейсы</h3>
+                    <p>Двусторонние платформы, агрегаторы, каталоги</p>
+                </div>
+            </div>
+            <div class="services-cta">
+                <p>Не нашли свой тип проекта? <a href="#contact">Напишите нам</a> — реализуем любую идею</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">FAQ</h2>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Что такое MVP?
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Minimum Viable Product — минимально жизнеспособный продукт с ключевыми функциями для проверки гипотезы на реальных пользователях.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Почему именно 14 дней?
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Оптимальный срок для создания работающего продукта с AI-агентами. За меньшее время невозможно качественно, дольше — теряется скорость.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Кто делает проект — AI или люди?
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>AI-агенты выполняют 80% работы. Наши специалисты управляют процессом, контролируют качество и принимают архитектурные решения.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Что я получу в итоге?
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Работающий продукт на вашем домене, исходный код в GitHub, документацию и 30-дневную поддержку.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Какие гарантии?
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Если не уложимся в срок по нашей вине — возвращаем 100% предоплаты.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Как происходит оплата?
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>50% предоплата при старте, 50% после приёмки. Возможна рассрочка.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Связаться с нами</h2>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-form">
+                    <h3>Готовы запустить MVP?</h3>
+                    <p>Оставьте заявку — перезвоним за 2 часа</p>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Имя *</label>
+                            <input type="text" id="name" required minlength="2" placeholder="Ваше имя">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" required placeholder="email@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Телефон</label>
+                            <input type="tel" id="phone" placeholder="+7 (999) 000-00-00">
+                        </div>
+                        <div class="form-group">
+                            <label for="projectType">Тип проекта</label>
+                            <select id="projectType">
+                                <option value="">Выберите тип</option>
+                                <option value="landing">Лендинг</option>
+                                <option value="saas">Web SaaS</option>
+                                <option value="mobile">Мобильное приложение</option>
+                                <option value="telegram">Telegram бот/Mini App</option>
+                                <option value="marketplace">Маркетплейс</option>
+                                <option value="other">Другое</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Описание идеи *</label>
+                            <textarea id="description" required minlength="20" placeholder="Опишите вашу идею..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Отправить заявку</button>
+                    </form>
+                    <div class="form-success" id="formSuccess">
+                        ✓ Заявка принята! Свяжемся в течение 2 часов
+                    </div>
+                </div>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <h4>Telegram</h4>
+                        <a href="https://t.me/mvpbot">@mvpbot</a>
+                        <a href="https://t.me/mvpbot" class="btn btn-outline">Написать</a>
+                    </div>
+                    <div class="contact-item">
+                        <h4>Email</h4>
+                        <a href="mailto:hello@mvpbot.ru">hello@mvpbot.ru</a>
+                    </div>
+                    <div class="contact-item">
+                        <h4>Время работы</h4>
+                        <p>Пн–Пт 9:00–21:00 МСК</p>
+                        <p class="contact-note">Отвечаем за 2 часа в рабочее время</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">MVPBot — MVP за 14 дней</div>
+                <div class="footer-links">
+                    <a href="#">Политика конфиденциальности</a>
+                    <a href="#">Оферта</a>
+                    <a href="#">Реквизиты</a>
+                </div>
+                <div class="footer-social">
+                    <a href="https://t.me/mvpbot"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></a>
+                    <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                © 2025 MVPBot. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide
+        lucide.createIcons();
+
+        // Canvas Background Animation
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        resize();
+        window.addEventListener('resize', resize);
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5 + 0.1;
+                this.color = ['#00f5ff', '#ff00ff', '#b8ff00', '#ff6b00'][Math.floor(Math.random() * 4)];
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        // Create particles
+        for (let i = 0; i < 80; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw connections
+            particles.forEach((p, i) => {
+                particles.forEach((p2, j) => {
+                    if (i < j) {
+                        const dx = p.x - p2.x;
+                        const dy = p.y - p2.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < 150) {
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.strokeStyle = `rgba(0, 245, 255, ${0.1 * (1 - dist / 150)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    }
+                });
+            });
+
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Sticky navigation
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Scroll reveal
+        const revealElements = document.querySelectorAll('.process-card, .timeline-item, .pricing-card, .idea-card, .benefit-item, .agent-card, .service-card, .faq-item');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        revealElements.forEach(el => observer.observe(el));
+
+        // Ideas filtering
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const ideaCards = document.querySelectorAll('.idea-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filter = btn.dataset.filter;
+                ideaCards.forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // FAQ accordion
+        const faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            question.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                faqItems.forEach(i => i.classList.remove('active'));
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Form validation
+        const contactForm = document.getElementById('contactForm');
+        const formSuccess = document.getElementById('formSuccess');
+
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const description = document.getElementById('description').value;
+
+            if (name.length < 2) {
+                alert('Имя должно содержать минимум 2 символа');
+                return;
+            }
+
+            if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                alert('Введите корректный email');
+                return;
+            }
+
+            if (description.length < 20) {
+                alert('Описание должно содержать минимум 20 символов');
+                return;
+            }
+
+            contactForm.style.display = 'none';
+            formSuccess.classList.add('show');
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Add reveal class styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .process-card, .timeline-item, .pricing-card, .idea-card, .benefit-item, .agent-card, .service-card, .faq-item {
+                opacity: 0;
+                transform: translateY(40px);
+                transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .process-card.active, .timeline-item.active, .pricing-card.active, .idea-card.active, .benefit-item.active, .agent-card.active, .service-card.active, .faq-item.active {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
